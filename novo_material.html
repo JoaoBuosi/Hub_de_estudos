@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Novo Material - Hub de Estudos</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<style>
+  body {
+    font-family: "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1b2a31;
+    color: #fff;
+  }
+  h1 { margin: 20px 0; }
+
+  /* Templates */
+  #templates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .template {
+    width: 150px;
+    height: 100px;
+    background: #2b3a42;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+  }
+  .template:hover { border-color: #ffcc00; }
+
+  /* Editor */
+  #editor {
+    width: 90%;
+    max-width: 1000px;
+    height: 500px;
+    background: #fff;
+    color: #000;
+    position: relative;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .element {
+    position: absolute;
+    border: 1px dashed #333;
+    padding: 5px;
+    cursor: move;
+    resize: both;
+    overflow: auto;
+    min-width: 50px;
+    min-height: 30px;
+  }
+  .selected { border: 2px solid #ffcc00; }
+
+  /* Botões de adicionar elementos */
+  #controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  button {
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: #4a6068;
+    color: #fff;
+  }
+  button:hover { background: #ffcc00; color: #000; }
+</style>
+</head>
+<body>
+
+<h1 id="tituloCabecalho">Criar Novo Material</h1>
+
+<div id="templates">
+  <div class="template" data-template="0">Template 1</div>
+  <div class="template" data-template="1">Template 2</div>
+  <div class="template" data-template="2">Template 3</div>
+  <div class="template" data-template="custom">Criar do Zero</div>
+</div>
+
+<div id="controls">
+  <button onclick="adicionarElemento('texto')">Texto</button>
+  <button onclick="adicionarElemento('imagem')">Imagem</button>
+  <button onclick="adicionarElemento('botao')">Botão</button>
+  <button onclick="adicionarElemento('video')">Vídeo</button>
+  <button onclick="adicionarElemento('icone')">Ícone</button>
+</div>
+
+<div id="editor"></div>
+
+<div>
+  <input type="text" id="materialTitle" placeholder="Nome do material">
+  <input type="color" id="buttonColor" value="#4a6068">
+  <button onclick="salvarMaterial()">Salvar Material</button>
+</div>
+
+<script>
+const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+if(!user) window.location.href = 'entrar.html';
+
+const editor = document.getElementById('editor');
+let selectedElement = null;
+
+// Templates pré-definidos
+const templates = [
+  { id: 0, nome: "Template 1", elementos: [{tipo:'texto', x:50, y:50, width:200, height:50, conteudo:'Olá!'}] },
+  { id: 1, nome: "Template 2", elementos: [{tipo:'imagem', x:100, y:50, width:100, height:100, src:''}] },
+  { id: 2, nome: "Template 3", elementos: [{tipo:'botao', x:50, y:200, width:100, height:50, conteudo:'Clique aqui'}] }
+];
+
+// Verifica se estamos editando um material existente
+let materialAtual = JSON.parse(localStorage.getItem('materialAtual'));
+if(materialAtual){
+  document.getElementById('tituloCabecalho').textContent = "Editar Material";
+  document.getElementById('materialTitle').value = materialAtual.titulo;
+  document.getElementById('buttonColor').value = materialAtual.cor || "#4a6068";
+  editor.innerHTML = '';
+  materialAtual.elementos.forEach(el => criarElemento(el));
+}
+
+// Escolher template
+document.querySelectorAll('.template').forEach(t => {
+  t.onclick = () => {
+    editor.innerHTML = '';
+    const id = t.dataset.template;
+    if(id === 'custom') return; // editor vazio
+    const template = templates.find(tp => tp.id == id);
+    template.elementos.forEach(el => criarElemento(el));
+  };
+});
+
+// Criar elemento
+function criarElemento(obj) {
+  const div = document.createElement('div');
+  div.className = 'element';
+  div.style.left = obj.x+'px';
+  div.style.top = obj.y+'px';
+  div.style.width = obj.width+'px';
+  div.style.height = obj.height+'px';
+  div.dataset.tipo = obj.tipo;
+
+  if(obj.tipo === 'texto') div.innerHTML = obj.conteudo || 'Texto';
+  if(obj.tipo === 'imagem') {
+    const img = document.createElement('img');
+    img.src = obj.src || '';
+    img.style.width='100%'; img.style.height='100%';
+    div.appendChild(img);
+  }
+  if(obj.tipo === 'botao') div.innerHTML = `<button style="width:100%;height:100%;">${obj.conteudo||'Botão'}</button>`;
+  if(obj.tipo === 'video') {
+    const vid = document.createElement('video');
+    vid.src = obj.src || '';
+    vid.controls = true;
+    vid.style.width='100%'; vid.style.height='100%';
+    div.appendChild(vid);
+  }
+  if(obj.tipo === 'icone') {
+    div.innerHTML = `<i class="${obj.conteudo||'fas fa-star'}" style="font-size:24px;"></i>`;
+  }
+
+  div.onclick = (e) => {
+    e.stopPropagation();
+    if(selectedElement) selectedElement.classList.remove('selected');
+    selectedElement = div;
+    div.classList.add('selected');
+  };
+
+  editor.appendChild(div);
+}
+
+// Adicionar elementos
+function adicionarElemento(tipo) {
+  let obj = {tipo, x:50, y:50, width:100, height:50};
+  if(tipo==='texto') obj.conteudo='Texto';
+  if(tipo==='botao') obj.conteudo='Botão';
+  if(tipo==='icone') obj.conteudo='fas fa-star';
+  criarElemento(obj);
+}
+
+// Drag-and-drop
+let offsetX, offsetY, dragging=false;
+editor.addEventListener('mousedown', e => {
+  if(e.target.classList.contains('element') || e.target.parentElement.classList.contains('element')){
+    const el = e.target.classList.contains('element') ? e.target : e.target.parentElement;
+    selectedElement = el;
+    offsetX = e.offsetX; offsetY = e.offsetY;
+    dragging = true;
+  }
+});
+editor.addEventListener('mousemove', e => {
+  if(dragging && selectedElement){
+    selectedElement.style.left = e.offsetX - offsetX + 'px';
+    selectedElement.style.top = e.offsetY - offsetY + 'px';
+  }
+});
+editor.addEventListener('mouseup', () => dragging=false);
+
+// Desselecionar clicando fora
+document.addEventListener('click', e => {
+  if(!editor.contains(e.target) && selectedElement) selectedElement.classList.remove('selected');
+});
+
+// Delete
+document.addEventListener('keydown', e => {
+  if(e.key==='Delete' && selectedElement){
+    selectedElement.remove();
+    selectedElement=null;
+  }
+});
+
+// Salvar material
+function salvarMaterial() {
+  const titulo = document.getElementById('materialTitle').value || 'Novo Material';
+  const cor = document.getElementById('buttonColor').value || '#4a6068';
+  const elements = [];
+  editor.querySelectorAll('.element').forEach(el => {
+    const tipo = el.dataset.tipo;
+    const obj = {tipo, x: el.offsetLeft, y: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight};
+    if(tipo==='texto') obj.conteudo = el.innerHTML;
+    if(tipo==='botao') obj.conteudo = el.querySelector('button')?.innerHTML;
+    if(tipo==='imagem') obj.src = el.querySelector('img')?.src || '';
+    if(tipo==='video') obj.src = el.querySelector('video')?.src || '';
+    if(tipo==='icone') obj.conteudo = el.querySelector('i')?.className;
+    elements.push(obj);
+  });
+
+  const materiais = JSON.parse(localStorage.getItem('materiaisUsuarios')||'{}');
+  let userMateriais = materiais[user.email] || [];
+
+  if(materialAtual){
+    // Editando material existente
+    const index = userMateriais.findIndex(m => m.id === materialAtual.id);
+    if(index!==-1){
+      userMateriais[index] = {id: materialAtual.id, titulo, cor, elementos: elements};
+    }
+    localStorage.removeItem('materialAtual');
+  } else {
+    // Novo material
+    userMateriais.push({id: Date.now().toString(), titulo, cor, elementos: elements});
+  }
+
+  materiais[user.email] = userMateriais;
+  localStorage.setItem('materiaisUsuarios', JSON.stringify(materiais));
+  alert('Material salvo com sucesso!');
+  window.location.href='painel.html';
+}
+</script>
+
+</body>
+</html>
