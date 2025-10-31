@@ -58,6 +58,58 @@
       height: 30px;
     }
 
+     .games {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(27,42,49,0.9);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin: 15px 0;
+      transition: 0.3s;
+      width: 250px;
+      gap: 10px;
+    }
+
+    .games:hover {
+      background-color: #4a6068;
+    }
+
+    .games img {
+      width: 30px;
+      height: 30px;
+    }
+
+     .jobs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(27,42,49,0.9);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin: 15px 0;
+      transition: 0.3s;
+      width: 250px;
+      gap: 10px;
+    }
+
+    .jobs:hover {
+      background-color: #4a6068;
+    }
+
+    .jobs img {
+      width: 30px;
+      height: 30px;
+    }
+
     /* Botão de criar material posicionado acima do outro botão */
     .top-btn {
       background-color: #1b2a31;
@@ -87,6 +139,17 @@
     <img src="Gemini_Generated_Image_huuc52huuc52huuc-removebg-preview (1).png" alt="Logo">
     Simulado PUC
   </button>
+
+  <button class="games" onclick="window.location.href='games.html'">
+    <img src="jogos.png" alt="Logo dos jogos">
+    Jogos que já fiz
+  </button>
+
+  <button class="jobs" onclick="window.location.href='trabalhos.html'">
+    <img src="trabalhos.png" alt="logo trabalhos">
+    Trabalhos e Projetos que ja fiz
+  </button>
+
 
   <script>
     // Mostra nome do usuário logado
