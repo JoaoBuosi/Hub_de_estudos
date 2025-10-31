@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Resultado Final</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 800px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  text-align: center;
+}
+h1 { margin-bottom: 20px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+td, th {
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 10px;
+  text-align: center;
+}
+#notaFinal {
+  font-size: 2em;
+  margin-top: 20px;
+  color: #ffeb3b;
+}
+.mensagem {
+  font-size: 1.2em;
+  margin-top: 15px;
+}
+button {
+  background-color: #1a4cf2;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+button:hover { background-color: #0c8eff; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📈 Resultado Final - Simulado PUC</h1>
+
+  <table id="tabelaNotas">
+    <tr><th>Matéria</th><th>Nota (0–50)</th></tr>
+  </table>
+
+  <div id="notaFinal"></div>
+  <div class="mensagem" id="mensagemFinal"></div>
+
+  <button onclick="window.location.href='index.html'">⬅ Voltar ao Menu</button>
+</div>
+
+<script>
+const tabela = document.getElementById("tabelaNotas");
+
+const materias = [
+  "matematica",
+  "redacao",
+  "sociologia",
+  "quimica",
+  "portugues",
+  "ingles",
+  "fisica",
+  "filosofia",
+  "historia"
+];
+
+let soma = 0;
+materias.forEach(m => {
+  const nota = parseFloat(localStorage.getItem("nota_" + m)) || 0;
+  soma += nota;
+  const row = document.createElement("tr");
+  row.innerHTML = `<td>${m.charAt(0).toUpperCase() + m.slice(1)}</td><td>${nota.toFixed(1)}</td>`;
+  tabela.appendChild(row);
+});
+
+// Nota final (0 a 100)
+const notaFinal = soma;
+document.getElementById("notaFinal").innerHTML = `🎯 Nota Final: ${notaFinal.toFixed(1)} / 100`;
+
+let msg = "";
+if (notaFinal < 70) msg = "📘 Estude mais! Você pode melhorar com prática.";
+else if (notaFinal < 90) msg = "💪 Você tem muita chance de passar!";
+else msg = "🎉 Bem-vindo à PUC! Parabéns pelo excelente desempenho!";
+
+document.getElementById("mensagemFinal").innerText = msg;
+</script>
+</body>
+</html>

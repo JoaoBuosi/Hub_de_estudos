@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Sociologia</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #141E30, #243B55);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.25);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #8e44ad;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #9b59b6; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.2);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #8e44ad;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #9b59b6; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #8e44ad;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>👥 Simulado PUC - Sociologia</h1>
+  <p>Escolha um tema e teste seus conhecimentos:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('sociedade')">Sociedade e Cultura</button>
+    <button onclick="abrirTema('classicos')">Marx, Durkheim e Weber</button>
+    <button onclick="abrirTema('politica')">Política e Cidadania</button>
+    <button onclick="abrirTema('globalizacao')">Globalização</button>
+    <button onclick="abrirTema('movimentos')">Movimentos Sociais</button>
+    <button onclick="abrirTema('identidade')">Identidade e Diversidade</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>   
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="voltarMenu()">⬅ Voltar ao Menu</button>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao Inicio</button>
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  sociedade: [
+    {pergunta:"A cultura pode ser definida como:", opcoes:["Um conjunto de leis","Um conjunto de costumes, valores e práticas de um grupo","A soma das riquezas de uma sociedade"], correta:"Um conjunto de costumes, valores e práticas de um grupo", explicacao:"Cultura é tudo aquilo que é aprendido e compartilhado socialmente."},
+    {pergunta:"A socialização é o processo pelo qual:", opcoes:["Os indivíduos aprendem e internalizam normas sociais","As sociedades se formam geograficamente","As pessoas se isolam do grupo"], correta:"Os indivíduos aprendem e internalizam normas sociais", explicacao:"É o processo de formação do indivíduo como ser social."}
+  ],
+  classicos: [
+    {pergunta:"Para Karl Marx, a história da humanidade é:", opcoes:["A luta entre as classes sociais","O desenvolvimento da religião","A expansão territorial"], correta:"A luta entre as classes sociais", explicacao:"Marx afirmava que a luta de classes é o motor da história."},
+    {pergunta:"Durkheim via a sociedade como:", opcoes:["Um conjunto de indivíduos isolados","Um corpo social com partes interdependentes","Uma soma de vontades individuais"], correta:"Um corpo social com partes interdependentes", explicacao:"Durkheim via a sociedade como algo maior que o indivíduo, com funções integradas."},
+    {pergunta:"Para Max Weber, a ação social é:", opcoes:["Toda ação com sentido dado pelo indivíduo","A ação automática de grupos","A ação política de massas"], correta:"Toda ação com sentido dado pelo indivíduo", explicacao:"Weber define ação social como aquela dotada de sentido subjetivo."}
+  ],
+  politica: [
+    {pergunta:"A cidadania está relacionada a:", opcoes:["Direitos e deveres dos indivíduos em uma sociedade","Somente o direito de votar","Apenas obrigações tributárias"], correta:"Direitos e deveres dos indivíduos em uma sociedade", explicacao:"Ser cidadão é ter direitos e deveres civis, políticos e sociais."},
+    {pergunta:"O Estado democrático de direito garante:", opcoes:["A supremacia militar","O poder absoluto do governo","A igualdade perante a lei"], correta:"A igualdade perante a lei", explicacao:"Em um Estado democrático, todos são iguais perante a lei."}
+  ],
+  globalizacao: [
+    {pergunta:"A globalização intensificou:", opcoes:["O isolamento cultural","A interconexão entre países e culturas","A volta ao localismo"], correta:"A interconexão entre países e culturas", explicacao:"A globalização aproxima economias, culturas e informações."},
+    {pergunta:"Um dos efeitos da globalização é:", opcoes:["A redução da comunicação","A criação de redes mundiais","O fechamento econômico"], correta:"A criação de redes mundiais", explicacao:"Ela cria redes de comércio, informação e cultura globais."}
+  ],
+  movimentos: [
+    {pergunta:"Os movimentos sociais buscam:", opcoes:["Manter a estrutura social","Promover mudanças sociais e políticas","Evitar o diálogo político"], correta:"Promover mudanças sociais e políticas", explicacao:"Movimentos sociais lutam por transformações na sociedade."},
+    {pergunta:"Um exemplo de movimento social é:", opcoes:["Movimento feminista","Copa do Mundo","Reuniões empresariais"], correta:"Movimento feminista", explicacao:"O movimento feminista luta por igualdade de gênero."}
+  ],
+  identidade: [
+    {pergunta:"Identidade social refere-se a:", opcoes:["O modo como nos reconhecemos em grupos sociais","O número de documentos de uma pessoa","A herança biológica"], correta:"O modo como nos reconhecemos em grupos sociais", explicacao:"Identidade é a forma como o indivíduo se vê e é visto socialmente."},
+    {pergunta:"A diversidade cultural deve ser:", opcoes:["Combatida","Tolerada com restrições","Respeitada e valorizada"], correta:"Respeitada e valorizada", explicacao:"Respeitar a diversidade é reconhecer o valor das diferenças."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+let questoesAtuais = [];
+function sortearQuestoes(tema){
+  const questoes = [...banco[tema]];
+  const selecionadas = [];
+  while(selecionadas.length<3 && questoes.length>0){
+    const idx = Math.floor(Math.random()*questoes.length);
+    selecionadas.push(questoes.splice(idx,1)[0]);
+  }
+  return selecionadas;
+}
+
+function abrirTema(tema){
+  const quizArea = document.getElementById("quizArea");
+  const menu = document.getElementById("menu");
+  const result = document.getElementById("result");
+  const backBtn = document.getElementById("backBtn");
+  const progressBar = document.querySelector(".progress-bar");
+
+  menu.classList.add("hidden");
+  result.innerHTML="";
+  backBtn.style.display="none";
+  document.getElementById("refazerErradas").classList.add("hidden");
+  quizArea.classList.remove("hidden");
+  progressBar.classList.remove("hidden");
+  atualizarProgresso(0,3);
+
+  questoesAtuais = sortearQuestoes(tema);
+  let html = `<h2>${tema.replace('_',' ').toUpperCase()}</h2><form id="quizForm">`;
+  questoesAtuais.forEach((q,i)=>{
+    html += `<div class="question" id="q${i}">
+      <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+    q.opcoes.forEach(op=>{
+      html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+    });
+    html += "</div>";
+  });
+  html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+  quizArea.innerHTML = html;
+
+  document.getElementById("quizForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    validarRespostas(questoesAtuais);
+  });
+}
+
+function validarRespostas(questoes){
+  for(let i=0;i<questoes.length;i++){
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(!marcada){
+      alert("⚠️ Você deve responder todas as questões antes de enviar!");
+      return;
+    }
+  }
+  corrigirProva(questoes);
+}
+
+function corrigirProva(questoes){
+  let acertos=0;
+  questoes.forEach((q,i)=>{
+    const labels = document.querySelectorAll(`#q${i} label`);
+    labels.forEach(label=>{
+      const input = label.querySelector("input");
+      input.disabled=true;
+      if(input.value===q.correta){ label.classList.add("correct"); acertos++;}
+      else if(input.checked){ label.classList.add("wrong");}
+    });
+    const divExp = document.createElement("div");
+    divExp.classList.add("explanation");
+    divExp.innerHTML = `<strong>Explicação:</strong> ${q.explicacao}`;
+    document.getElementById(`q${i}`).appendChild(divExp);
+  });
+  document.getElementById("result").innerHTML = `✅ Você acertou ${acertos} de ${questoes.length} questões!`;
+  document.getElementById("refazerErradas").classList.remove("hidden");
+  document.getElementById("backBtn").style.display="block";
+}
+
+function atualizarProgresso(feito,total){
+  const barra = document.getElementById("progress");
+  barra.style.width = `${(feito/total)*100}%`;
+}
+
+function voltarMenu(){
+  document.getElementById("quizArea").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("result").innerHTML="";
+  document.querySelector(".progress-bar").classList.add("hidden");
+  document.getElementById("refazerErradas").classList.add("hidden");
+}
+
+function refazerErradas(){
+  const erradas = [];
+  questoesAtuais.forEach((q,i)=>{
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(marcada.value !== q.correta) erradas.push(q);
+  });
+  if(erradas.length>0){
+    questoesAtuais = erradas;
+    let html = `<h2>Refazendo Questões Erradas</h2><form id="quizForm">`;
+    questoesAtuais.forEach((q,i)=>{
+      html += `<div class="question" id="q${i}">
+        <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+      q.opcoes.forEach(op=>{
+        html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+      });
+      html += "</div>";
+    });
+    html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+    document.getElementById("quizArea").innerHTML = html;
+    document.getElementById("result").innerHTML="";
+    document.getElementById("refazerErradas").classList.add("hidden");
+    atualizarProgresso(0,questoesAtuais.length);
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      validarRespostas(questoesAtuais);
+    });
+  } else {
+    alert("🎉 Parabéns! Você acertou todas!");
+    voltarMenu();
+  }
+}
+</script>
+</body>
+</html>

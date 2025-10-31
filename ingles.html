@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Inglês</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #1a4cf2;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #0c8eff; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.15);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #0d47a1;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #1167bd; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #1a4cf2;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>🇬🇧 Simulado PUC - Inglês</h1>
+  <p>Escolha um tema e receba questões aleatórias:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('reading')">Reading</button>
+    <button onclick="abrirTema('vocabulary')">Vocabulary</button>
+    <button onclick="abrirTema('grammar')">Grammar</button>
+    <button onclick="abrirTema('verbs')">Verbs (Tenses)</button>
+    <button onclick="abrirTema('prepositions')">Prepositions</button>
+    <button onclick="abrirTema('interpretation')">Text Interpretation</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao Menu</button>
+
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  reading: [
+    {pergunta:"In the sentence 'She usually goes to school by bus', the word 'usually' means:", opcoes:["always","sometimes","most of the time"], correta:"most of the time", explicacao:"'Usually' indica frequência habitual, ou seja, na maioria das vezes."},
+    {pergunta:"The word 'environment' refers to:", opcoes:["The natural world around us","A small community","Technology"], correta:"The natural world around us", explicacao:"'Environment' significa meio ambiente."}
+  ],
+  vocabulary: [
+    {pergunta:"Choose the correct synonym for 'happy':", opcoes:["sad","glad","angry"], correta:"glad", explicacao:"'Glad' é sinônimo de 'happy'."},
+    {pergunta:"The opposite of 'cheap' is:", opcoes:["expensive","big","long"], correta:"expensive", explicacao:"'Cheap' = barato, 'expensive' = caro."}
+  ],
+  grammar: [
+    {pergunta:"Complete: She ___ to the gym every day.", opcoes:["go","goes","going"], correta:"goes", explicacao:"Terceira pessoa no presente simples → acrescenta-se 'es'."},
+    {pergunta:"Choose the correct sentence:", opcoes:["He don't like pizza","He doesn’t like pizza","He doesn’t likes pizza"], correta:"He doesn’t like pizza", explicacao:"Após 'doesn't' o verbo volta à forma base (sem 's')."}
+  ],
+  verbs: [
+    {pergunta:"They ___ finished their homework yesterday.", opcoes:["have","has","had"], correta:"had", explicacao:"O verbo 'had' indica passado perfeito (Past Perfect)."},
+    {pergunta:"I ___ to London last year.", opcoes:["go","went","gone"], correta:"went", explicacao:"Verbo irregular 'go' → passado 'went'."}
+  ],
+  prepositions: [
+    {pergunta:"He was born ___ 1998.", opcoes:["on","at","in"], correta:"in", explicacao:"Usamos 'in' com anos e meses."},
+    {pergunta:"The book is ___ the table.", opcoes:["in","on","at"], correta:"on", explicacao:"Usamos 'on' para indicar que algo está sobre uma superfície."}
+  ],
+  interpretation: [
+    {pergunta:"If a text says 'The company reduced pollution levels', it means:", opcoes:["The company increased pollution","The company made less pollution","The company ignored pollution"], correta:"The company made less pollution", explicacao:"'Reduced pollution' significa que a poluição diminuiu."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+let questoesAtuais = [];
+function sortearQuestoes(tema){
+  const questoes = [...banco[tema]];
+  const selecionadas = [];
+  while(selecionadas.length<3 && questoes.length>0){
+    const idx = Math.floor(Math.random()*questoes.length);
+    selecionadas.push(questoes.splice(idx,1)[0]);
+  }
+  return selecionadas;
+}
+
+function abrirTema(tema){
+  const quizArea = document.getElementById("quizArea");
+  const menu = document.getElementById("menu");
+  const result = document.getElementById("result");
+  const backBtn = document.getElementById("backBtn");
+  const progressBar = document.querySelector(".progress-bar");
+
+  menu.classList.add("hidden");
+  result.innerHTML="";
+  backBtn.style.display="none";
+  document.getElementById("refazerErradas").classList.add("hidden");
+  quizArea.classList.remove("hidden");
+  progressBar.classList.remove("hidden");
+  atualizarProgresso(0,3);
+
+  questoesAtuais = sortearQuestoes(tema);
+  let html = `<h2>${tema.replace('_',' ').toUpperCase()}</h2><form id="quizForm">`;
+  questoesAtuais.forEach((q,i)=>{
+    html += `<div class="question" id="q${i}">
+      <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+    q.opcoes.forEach(op=>{
+      html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+    });
+    html += "</div>";
+  });
+  html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+  quizArea.innerHTML = html;
+
+  document.getElementById("quizForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    validarRespostas(questoesAtuais);
+  });
+}
+
+function validarRespostas(questoes){
+  for(let i=0;i<questoes.length;i++){
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(!marcada){
+      alert("⚠️ Você deve responder todas as questões antes de enviar!");
+      return;
+    }
+  }
+  corrigirProva(questoes);
+}
+
+function corrigirProva(questoes){
+  let acertos=0;
+  questoes.forEach((q,i)=>{
+    const labels = document.querySelectorAll(`#q${i} label`);
+    labels.forEach(label=>{
+      const input = label.querySelector("input");
+      input.disabled=true;
+      if(input.value===q.correta){ label.classList.add("correct"); acertos++;}
+      else if(input.checked){ label.classList.add("wrong");}
+    });
+    const divExp = document.createElement("div");
+    divExp.classList.add("explanation");
+    divExp.innerHTML = `<strong>Explanation:</strong> ${q.explicacao}`;
+    document.getElementById(`q${i}`).appendChild(divExp);
+  });
+  document.getElementById("result").innerHTML = `✅ You got ${acertos} out of ${questoes.length} questions right!`;
+  document.getElementById("refazerErradas").classList.remove("hidden");
+  document.getElementById("backBtn").style.display="block";
+}
+
+function atualizarProgresso(feito,total){
+  const barra = document.getElementById("progress");
+  barra.style.width = `${(feito/total)*100}%`;
+}
+
+function voltarMenu(){
+  document.getElementById("quizArea").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("result").innerHTML="";
+  document.querySelector(".progress-bar").classList.add("hidden");
+  document.getElementById("refazerErradas").classList.add("hidden");
+}
+
+function refazerErradas(){
+  const erradas = [];
+  questoesAtuais.forEach((q,i)=>{
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(marcada.value !== q.correta) erradas.push(q);
+  });
+  if(erradas.length>0){
+    questoesAtuais = erradas;
+    let html = `<h2>Retry Wrong Questions</h2><form id="quizForm">`;
+    questoesAtuais.forEach((q,i)=>{
+      html += `<div class="question" id="q${i}">
+        <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+      q.opcoes.forEach(op=>{
+        html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+      });
+      html += "</div>";
+    });
+    html += `<button type="submit" class="submit">Submit Answers</button></form>`;
+    document.getElementById("quizArea").innerHTML = html;
+    document.getElementById("result").innerHTML="";
+    document.getElementById("refazerErradas").classList.add("hidden");
+    atualizarProgresso(0,questoesAtuais.length);
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      validarRespostas(questoesAtuais);
+    });
+  } else {
+    alert("🎉 Great job! You got them all right!");
+    voltarMenu();
+  }
+}
+</script>
+</body>
+</html>

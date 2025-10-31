@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar Conta | Hub de Estudos</title>
+  <link rel="icon" href="./pucfavicon.ico">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #ffffff, #373d3f, #1b2a31);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .register-container {
+      background-color: rgba(0,0,0,0.3);
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      width: 380px;
+      text-align: center;
+    }
+
+    .register-container h2 {
+      margin-bottom: 25px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background-color: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 1em;
+    }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    .btn-criar {
+      background-color: #1b2a31;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1em;
+    }
+
+    .btn-criar:hover {
+      background-color: #4a6068;
+    }
+
+    .links {
+      margin-top: 15px;
+      font-size: 0.9em;
+    }
+
+    .links a {
+      color: #ccc;
+      text-decoration: none;
+    }
+
+    .links a:hover {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="register-container">
+    <h2>Criar Conta</h2>
+    <form id="formCadastro">
+      <input type="text" id="nome" placeholder="Nome completo" required>
+      <input type="email" id="email" placeholder="E-mail" required>
+      <input type="password" id="senha" placeholder="Senha" required>
+      <input type="password" id="confirmar" placeholder="Confirmar senha" required>
+      <button type="submit" class="btn-criar">Cadastrar</button>
+    </form>
+    <div class="links">
+      <p>Já tem conta? <a href="entrar.html">Entrar</a></p>
+      <p><a href="menu.html">Voltar ao menu</a></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('formCadastro');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+      const confirmar = document.getElementById('confirmar').value;
+
+      if (senha !== confirmar) {
+        alert('As senhas não coincidem!');
+        return;
+      }
+
+      // Pega os usuários existentes
+      let usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+
+      // Verifica se já existe o e-mail
+      if (usuarios.find(u => u.email === email)) {
+        alert('Este e-mail já está cadastrado!');
+        return;
+      }
+
+      // Salva novo usuário
+      usuarios.push({
+        nome,
+        email,
+        senha: btoa(senha) // Criptografia leve
+      });
+
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+      alert('Conta criada com sucesso! Agora faça login.');
+      window.location.href = 'entrar.html';
+    });
+  </script>
+
+</body>
+</html>

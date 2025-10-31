@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC</title>
+<link rel="icon" href="./pucfavicon.ico">
+</head>
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu-cursos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu-cursos button {
+  background-color: #1a4cf2;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #0c8eff; transform: scale(1.05); }
+</style>
+<body>
+<div class="container">
+  <h1>🎓 Simulado PUC - Escolha a matéria</h1>
+  <div class="menu-cursos">
+    <button onclick="window.location.href='matematica.html'">Matemática</button>
+    <button onclick="window.location.href='portugues.html'">Língua Portuguesa</button>
+    <button onclick="window.location.href='ingles.html'">Inglês</button>
+    <button onclick="window.location.href='historia.html'">História</button>
+    <button onclick="window.location.href='fisica.html'">Física</button>
+    <button onclick="window.location.href='quimica.html'">Química</button>
+    <button onclick="window.location.href='filosofia.html'">Filosofia</button>
+    <button onclick="window.location.href='sociologia.html'">Sociologia</button>
+    <button onclick="window.location.href='redacao.html'">Redação</button>
+    <button onclick="window.location.href='resultado.html'">Resultado</button>
+  </div>
+</div>
+</body>
+</html>

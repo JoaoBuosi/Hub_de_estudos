@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Redação</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+textarea {
+  width: 100%;
+  height: 400px;
+  padding: 15px;
+  border-radius: 10px;
+  border: none;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+}
+textarea:focus { outline: none; background-color: rgba(255,255,255,0.15); }
+button {
+  display: block;
+  background-color: #0d47a1;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button:hover { background-color: #1167bd; }
+#result {
+  background-color: rgba(255,255,255,0.15);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+#counter {
+  text-align: right;
+  font-size: 14px;
+  color: #ffeb3b;
+  margin-top: 5px;
+}
+.hidden { display: none; }
+#backBtn {
+  background-color: #1a4cf2;
+}
+#backBtn:hover {
+  background-color: #0c8eff;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 Simulado PUC - Redação</h1>
+  <p>Escreva sua redação abaixo. O texto deve ter entre <strong>12 e 30 linhas</strong>.</p>
+  <textarea id="texto" placeholder="Digite sua redação aqui..."></textarea>
+  <div id="counter">0 linhas</div>
+  <button onclick="avaliarRedacao()">Enviar Redação</button>
+  <div id="result" class="hidden"></div>
+  
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao Menu</button>
+</div>
+
+<script>
+// --------------------- Contador de Linhas ---------------------
+const textarea = document.getElementById("texto");
+const counter = document.getElementById("counter");
+
+textarea.addEventListener("input", () => {
+  const linhas = textarea.value.split(/\n/).filter(l => l.trim() !== "").length;
+  counter.textContent = `${linhas} linhas`;
+});
+
+// --------------------- Avaliação ---------------------
+function avaliarRedacao() {
+  const texto = textarea.value.trim();
+  const linhas = texto.split(/\n/).filter(l => l.trim() !== "").length;
+  const result = document.getElementById("result");
+
+  if (linhas < 12) {
+    result.classList.remove("hidden");
+    result.innerHTML = "⚠️ Sua redação tem menos de 12 linhas. Escreva um pouco mais para desenvolver melhor as ideias.";
+    return;
+  }
+  if (linhas > 30) {
+    result.classList.remove("hidden");
+    result.innerHTML = "⚠️ Sua redação ultrapassou 30 linhas. Tente ser mais conciso e direto.";
+    return;
+  }
+
+  // Análise básica de qualidade
+  const palavras = texto.split(/\s+/);
+  const tamanho = palavras.length;
+  const temIntroducao = /introdu|tema|context/.test(texto.toLowerCase());
+  const temConclusao = /conclu|portanto|finalmente/.test(texto.toLowerCase());
+  const errosGramaticais = (texto.match(/( +,| ,|\. ,|,,)/g) || []).length;
+  const repeticoes = (texto.match(/\b(muito|coisa|legal|bom|ruim)\b/gi) || []).length;
+
+  // Cálculo da nota
+  let nota = 1000;
+  let feedback = [];
+
+  if (tamanho < 150) { nota -= 150; feedback.push("O texto está muito curto. Desenvolva melhor os argumentos."); }
+  if (tamanho > 600) { nota -= 100; feedback.push("O texto está um pouco extenso. Evite repetições e vá direto ao ponto."); }
+  if (!temIntroducao) { nota -= 150; feedback.push("Faltou uma introdução clara do tema."); }
+  if (!temConclusao) { nota -= 150; feedback.push("Faltou uma conclusão que encerre as ideias apresentadas."); }
+  if (errosGramaticais > 2) { nota -= errosGramaticais * 20; feedback.push("Revise a pontuação e a gramática do texto."); }
+  if (repeticoes > 3) { nota -= 50; feedback.push("Evite repetir palavras simples como 'muito', 'coisa' ou 'bom'."); }
+
+  if (nota > 900) feedback.push("Excelente redação! Boa estrutura, coerência e clareza.");
+  else if (nota > 700) feedback.push("Boa redação, mas ainda há pontos a melhorar em coesão e desenvolvimento.");
+  else if (nota > 500) feedback.push("Redação razoável, mas precisa de mais estrutura e clareza nas ideias.");
+  else feedback.push("Reveja a estrutura textual. Trabalhe introdução, argumentação e conclusão.");
+
+  if (nota < 0) nota = 0;
+
+  result.classList.remove("hidden");
+  result.innerHTML = `
+    <h2>📊 Avaliação da Redação</h2>
+    <p><strong>Nota:</strong> ${nota.toFixed(0)}/1000</p>
+    <ul>${feedback.map(f => `<li>${f}</li>`).join("")}</ul>
+  `;
+  const notaRedacao50 = (nota / 1000) * 50;
+localStorage.setItem("nota_redacao", notaRedacao50.toFixed(1));
+
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Matemática</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #1a4cf2;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #0c8eff; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.15);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #0d47a1;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #1167bd; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #1a4cf2;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>🧮 Simulado PUC - Matemática</h1>
+  <p>Escolha um tema e receba questões aleatórias:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('mmc_mdc')">MMC e MDC</button>
+    <button onclick="abrirTema('pg')">Progressão Geométrica</button>
+    <button onclick="abrirTema('volume')">Volume, Prismas e Cilindros</button>
+    <button onclick="abrirTema('funcoes')">Funções</button>
+    <button onclick="abrirTema('equacoes')">Equações</button>
+    <button onclick="abrirTema('probabilidade')">Probabilidade</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="voltarMenu()">⬅ Voltar ao Menu</button>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao inicio</button>
+
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  mmc_mdc: [
+    {pergunta:"O MMC entre 12 e 18 é:", opcoes:["24","36","72"], correta:"36", explicacao:"12 = 2²×3, 18 = 2×3² → MMC = 2²×3² = 36."},
+    {pergunta:"O MDC entre 20 e 30 é:", opcoes:["5","10","15"], correta:"10", explicacao:"20 = 2²×5, 30 = 2×3×5 → MDC = 2×5 = 10."},
+    {pergunta:"O MMC entre 8, 6 e 10 é:", opcoes:["60","120","240"], correta:"120", explicacao:"MMC = 2³×3×5 = 120."},
+    {pergunta:"O MDC entre 36 e 54 é:", opcoes:["9","18","27"], correta:"18", explicacao:"MDC = 18 pois é o maior divisor comum."},
+    {pergunta:"O MMC entre 15 e 25 é:", opcoes:["50","75","100"], correta:"75", explicacao:"15 = 3×5, 25 = 5² → MMC = 3×5² = 75."}
+  ],
+  pg: [
+    {pergunta:"Uma PG tem a₁=2 e r=3. O 4º termo é:", opcoes:["18","27","54"], correta:"54", explicacao:"a₄ = 2×3³ = 54."},
+    {pergunta:"A soma dos 3 primeiros termos de (1,2,4,...) é:", opcoes:["6","7","8"], correta:"7", explicacao:"1+2+4 = 7."},
+    {pergunta:"Numa PG, a₁=5 e a₃=45. A razão é:", opcoes:["2","3","4"], correta:"3", explicacao:"a₃ = a₁×r² → 45 = 5×r² → r²=9 → r=3."},
+    {pergunta:"A razão da PG (8,4,2,1,...) é:", opcoes:["1/2","2","-2"], correta:"1/2", explicacao:"Cada termo é metade do anterior → r=1/2."},
+    {pergunta:"Em uma PG, a₁=3 e r=2. O 6º termo é:", opcoes:["96","48","32"], correta:"96", explicacao:"a₆ = 3×2⁵ = 96."}
+  ],
+  volume: [
+    {pergunta:"Volume de um cubo com aresta 5cm:", opcoes:["25 cm³","125 cm³","100 cm³"], correta:"125 cm³", explicacao:"V = a³ = 5³ = 125 cm³."},
+    {pergunta:"Um cilindro de raio 2cm e altura 10cm tem volume (π≈3,14):", opcoes:["125,6 cm³","62,8 cm³","80 cm³"], correta:"125,6 cm³", explicacao:"V = πr²h = 3,14×4×10 = 125,6 cm³."},
+    {pergunta:"Volume de um prisma de base 15cm² e altura 8cm:", opcoes:["120 cm³","100 cm³","160 cm³"], correta:"120 cm³", explicacao:"V = Ab×h = 15×8 = 120 cm³."},
+    {pergunta:"Um cilindro com raio 3cm e altura 12cm tem volume (π≈3,14):", opcoes:["339,12 cm³","339 cm³","407 cm³"], correta:"339,12 cm³", explicacao:"V = 3,14×9×12 = 339,12 cm³."},
+    {pergunta:"Um cubo tem volume 64 cm³. Sua aresta é:", opcoes:["2 cm","4 cm","8 cm"], correta:"4 cm", explicacao:"a³ = 64 → a = 4 cm."}
+  ],
+  funcoes: [
+    {pergunta:"f(x) = 2x + 3. f(2) = ?", opcoes:["4","7","8"], correta:"7", explicacao:"f(2) = 2*2 + 3 = 7."},
+    {pergunta:"f(x) = x² - 4. f(3) = ?", opcoes:["5","9","-1"], correta:"5", explicacao:"f(3) = 9 - 4 = 5."},
+    {pergunta:"f(x) = -x + 6. f(2) = ?", opcoes:["4","-4","8"], correta:"4", explicacao:"f(2) = -2 + 6 = 4."}
+  ],
+  equacoes: [
+    {pergunta:"x + 5 = 12. x = ?", opcoes:["5","7","17"], correta:"7", explicacao:"x = 12 - 5 = 7."},
+    {pergunta:"2x - 3 = 9. x = ?", opcoes:["6","12","3"], correta:"6", explicacao:"2x = 12 → x = 6."}
+  ],
+  probabilidade: [
+    {pergunta:"Probabilidade de tirar cara em moeda justa:", opcoes:["1/2","1/3","1/4"], correta:"1/2", explicacao:"A moeda tem 2 lados iguais → 1/2."},
+    {pergunta:"Probabilidade de sair 6 em dado justo:", opcoes:["1/6","1/5","1/3"], correta:"1/6", explicacao:"Um dado tem 6 lados → 1/6."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+let questoesAtuais = [];
+function sortearQuestoes(tema){
+  const questoes = [...banco[tema]];
+  const selecionadas = [];
+  while(selecionadas.length<3 && questoes.length>0){
+    const idx = Math.floor(Math.random()*questoes.length);
+    selecionadas.push(questoes.splice(idx,1)[0]);
+  }
+  return selecionadas;
+}
+
+function abrirTema(tema){
+  const quizArea = document.getElementById("quizArea");
+  const menu = document.getElementById("menu");
+  const result = document.getElementById("result");
+  const backBtn = document.getElementById("backBtn");
+  const progressBar = document.querySelector(".progress-bar");
+
+  menu.classList.add("hidden");
+  result.innerHTML="";
+  backBtn.style.display="none";
+  document.getElementById("refazerErradas").classList.add("hidden");
+  quizArea.classList.remove("hidden");
+  progressBar.classList.remove("hidden");
+  atualizarProgresso(0,3);
+
+  questoesAtuais = sortearQuestoes(tema);
+  let html = `<h2>${tema.replace('_',' ').toUpperCase()}</h2><form id="quizForm">`;
+  questoesAtuais.forEach((q,i)=>{
+    html += `<div class="question" id="q${i}">
+      <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+    q.opcoes.forEach(op=>{
+      html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+    });
+    html += "</div>";
+  });
+  html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+  quizArea.innerHTML = html;
+
+  document.getElementById("quizForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    validarRespostas(questoesAtuais);
+  });
+}
+
+function validarRespostas(questoes){
+  for(let i=0;i<questoes.length;i++){
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(!marcada){
+      alert("⚠️ Você deve responder todas as questões antes de enviar!");
+      return;
+    }
+  }
+  corrigirProva(questoes);
+}
+
+function corrigirProva(questoes){
+  let acertos=0;
+  questoes.forEach((q,i)=>{
+    const labels = document.querySelectorAll(`#q${i} label`);
+    labels.forEach(label=>{
+      const input = label.querySelector("input");
+      input.disabled=true;
+      if(input.value===q.correta){ label.classList.add("correct"); acertos++;}
+      else if(input.checked){ label.classList.add("wrong");}
+    });
+    const divExp = document.createElement("div");
+    divExp.classList.add("explanation");
+    divExp.innerHTML = `<strong>Explicação:</strong> ${q.explicacao}`;
+    document.getElementById(`q${i}`).appendChild(divExp);
+  });
+  document.getElementById("result").innerHTML = `✅ Você acertou ${acertos} de ${questoes.length} questões!`;
+  document.getElementById("refazerErradas").classList.remove("hidden");
+  document.getElementById("backBtn").style.display="block";
+}
+
+function atualizarProgresso(feito,total){
+  const barra = document.getElementById("progress");
+  barra.style.width = `${(feito/total)*100}%`;
+}
+
+function voltarMenu(){
+  document.getElementById("quizArea").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("result").innerHTML="";
+  document.querySelector(".progress-bar").classList.add("hidden");
+  document.getElementById("refazerErradas").classList.add("hidden");
+}
+
+function refazerErradas(){
+  const erradas = [];
+  questoesAtuais.forEach((q,i)=>{
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(marcada.value !== q.correta) erradas.push(q);
+  });
+  if(erradas.length>0){
+    questoesAtuais = erradas;
+    let html = `<h2>Refazendo Questões Erradas</h2><form id="quizForm">`;
+    questoesAtuais.forEach((q,i)=>{
+      html += `<div class="question" id="q${i}">
+        <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+      q.opcoes.forEach(op=>{
+        html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+      });
+      html += "</div>";
+    });
+    html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+    document.getElementById("quizArea").innerHTML = html;
+    document.getElementById("result").innerHTML="";
+    document.getElementById("refazerErradas").classList.add("hidden");
+    atualizarProgresso(0,questoesAtuais.length);
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      validarRespostas(questoesAtuais);
+    });
+  } else {
+    alert("🎉 Parabéns! Você acertou todas!");
+    voltarMenu();
+  }
+}
+</script>
+</body>
+</html>

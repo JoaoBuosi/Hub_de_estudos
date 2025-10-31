@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Filosofia</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #1a4cf2;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #0c8eff; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.15);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #0d47a1;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #1167bd; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #1a4cf2;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>📚 Simulado PUC - Filosofia</h1>
+  <p>Escolha um tema e receba questões aleatórias:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('etica')">Ética</button>
+    <button onclick="abrirTema('politica')">Filosofia Política</button>
+    <button onclick="abrirTema('filosofia_antiga')">Filosofia Antiga</button>
+    <button onclick="abrirTema('filosofia_modernidade')">Filosofia Moderna</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao Menu</button>
+
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  etica: [
+    {pergunta:"Qual filósofo é considerado o pai da ética moderna?", opcoes:["Immanuel Kant","Platão","Aristóteles"], correta:"Immanuel Kant", explicacao:"Kant desenvolveu a ética deontológica, baseada no dever."},
+    {pergunta:"O que é ética utilitarista?", opcoes:["Focar nas consequências das ações","Seguir regras absolutas","Agir por tradição"], correta:"Focar nas consequências das ações", explicacao:"O utilitarismo avalia o que gera mais bem-estar."}
+  ],
+  politica: [
+    {pergunta:"Para Rousseau, a liberdade natural é:", opcoes:["A liberdade de obedecer à lei","A liberdade sem restrições","Liberdade econômica"], correta:"A liberdade sem restrições", explicacao:"Rousseau acredita que o homem nasce livre e a sociedade impõe restrições."},
+    {pergunta:"Quem escreveu 'O Príncipe'?", opcoes:["Maquiavel","Hobbes","Locke"], correta:"Maquiavel", explicacao:"Maquiavel analisa a política realista e a manutenção do poder."}
+  ],
+  filosofia_antiga: [
+    {pergunta:"Quem foi discípulo de Sócrates?", opcoes:["Platão","Aristóteles","Epicuro"], correta:"Platão", explicacao:"Platão registrou os ensinamentos de Sócrates."}
+  ],
+  filosofia_modernidade: [
+    {pergunta:"Descartes é conhecido por qual máxima?", opcoes:["Penso, logo existo","A vida é sofrimento","Conhece-te a ti mesmo"], correta:"Penso, logo existo", explicacao:"Descartes buscava certeza absoluta através da razão."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+// O restante do script pode ser **copiado exatamente do arquivo de Matemática**, sem alterações.
+</script>
+</body>
+</html>

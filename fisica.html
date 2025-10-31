@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Física</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.2);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #1a4cf2;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #0c8eff; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.15);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #0d47a1;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #1167bd; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #1a4cf2;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>⚛️ Simulado PUC - Física</h1>
+  <p>Escolha um tema e receba questões aleatórias:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('cinematica')">Cinemática</button>
+    <button onclick="abrirTema('dinamica')">Dinâmica</button>
+    <button onclick="abrirTema('energia')">Energia e Trabalho</button>
+    <button onclick="abrirTema('eletricidade')">Eletricidade</button>
+    <button onclick="abrirTema('termodinamica')">Termodinâmica</button>
+    <button onclick="abrirTema('optica')">Óptica</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="window.location.href='index.html'">⬅ Voltar ao Menu</button>
+
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  cinemática: [
+    {pergunta:"Um carro percorre 100 km em 2h. Qual a velocidade média?", opcoes:["50 km/h","100 km/h","25 km/h"], correta:"50 km/h", explicacao:"v = Δs/Δt = 100/2 = 50 km/h."},
+    {pergunta:"Um corpo em queda livre a 10 m/s atinge em 3s, qual a altura aproximada?", opcoes:["45 m","30 m","90 m"], correta:"45 m", explicacao:"s = v*t/2 ≈ 10*3/2 = 15 m? (usar g = 10 m/s²: s = 1/2*10*3²=45 m)."}
+  ],
+  dinamica: [
+    {pergunta:"Força necessária para acelerar 2 kg a 3 m/s²:", opcoes:["6 N","5 N","9 N"], correta:"6 N", explicacao:"F = m*a = 2*3 = 6 N."},
+    {pergunta:"Um objeto de 5 kg sofre força de 20 N. Aceleração:", opcoes:["4 m/s²","5 m/s²","3 m/s²"], correta:"4 m/s²", explicacao:"a = F/m = 20/5 = 4 m/s²."}
+  ],
+  energia: [
+    {pergunta:"Energia cinética de 2 kg a 3 m/s:", opcoes:["9 J","18 J","6 J"], correta:"9 J", explicacao:"Ec = 1/2 m v² = 1/2*2*3² = 9 J."}
+  ],
+  eletricidade: [
+    {pergunta:"Corrente de 2 A em resistor 5 Ω:", opcoes:["10 V","7 V","5 V"], correta:"10 V", explicacao:"V = R*I = 5*2 = 10 V."}
+  ],
+  termodinamica: [
+    {pergunta:"Calor necessário para aquecer 2 kg de água de 20°C a 100°C (c=4,2 kJ/kg°C):", opcoes:["672 kJ","840 kJ","400 kJ"], correta:"672 kJ", explicacao:"Q = m*c*ΔT = 2*4,2*(100-20) = 672 kJ."}
+  ],
+  optica: [
+    {pergunta:"Refração da luz do ar (n=1) para vidro (n=1,5). Ângulo crítico se θ2=90°?", opcoes:["41,8°","45°","30°"], correta:"41,8°", explicacao:"senθc = n2/n1 = 1/1,5 → θc ≈ 41,8°."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+let questoesAtuais = [];
+function sortearQuestoes(tema){
+  const questoes = [...banco[tema]];
+  const selecionadas = [];
+  while(selecionadas.length<3 && questoes.length>0){
+    const idx = Math.floor(Math.random()*questoes.length);
+    selecionadas.push(questoes.splice(idx,1)[0]);
+  }
+  return selecionadas;
+}
+
+function abrirTema(tema){
+  const quizArea = document.getElementById("quizArea");
+  const menu = document.getElementById("menu");
+  const result = document.getElementById("result");
+  const backBtn = document.getElementById("backBtn");
+  const progressBar = document.querySelector(".progress-bar");
+
+  menu.classList.add("hidden");
+  result.innerHTML="";
+  backBtn.style.display="none";
+  document.getElementById("refazerErradas").classList.add("hidden");
+  quizArea.classList.remove("hidden");
+  progressBar.classList.remove("hidden");
+  atualizarProgresso(0,3);
+
+  questoesAtuais = sortearQuestoes(tema);
+  let html = `<h2>${tema.replace('_',' ').toUpperCase()}</h2><form id="quizForm">`;
+  questoesAtuais.forEach((q,i)=>{
+    html += `<div class="question" id="q${i}">
+      <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+    q.opcoes.forEach(op=>{
+      html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+    });
+    html += "</div>";
+  });
+  html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+  quizArea.innerHTML = html;
+
+  document.getElementById("quizForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    validarRespostas(questoesAtuais);
+  });
+}
+
+function validarRespostas(questoes){
+  for(let i=0;i<questoes.length;i++){
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(!marcada){
+      alert("⚠️ Você deve responder todas as questões antes de enviar!");
+      return;
+    }
+  }
+  corrigirProva(questoes);
+}
+
+function corrigirProva(questoes){
+  let acertos=0;
+  questoes.forEach((q,i)=>{
+    const labels = document.querySelectorAll(`#q${i} label`);
+    labels.forEach(label=>{
+      const input = label.querySelector("input");
+      input.disabled=true;
+      if(input.value===q.correta){ label.classList.add("correct"); acertos++;}
+      else if(input.checked){ label.classList.add("wrong");}
+    });
+    const divExp = document.createElement("div");
+    divExp.classList.add("explanation");
+    divExp.innerHTML = `<strong>Explicação:</strong> ${q.explicacao}`;
+    document.getElementById(`q${i}`).appendChild(divExp);
+  });
+  document.getElementById("result").innerHTML = `✅ Você acertou ${acertos} de ${questoes.length} questões!`;
+  document.getElementById("refazerErradas").classList.remove("hidden");
+  document.getElementById("backBtn").style.display="block";
+}
+
+function atualizarProgresso(feito,total){
+  const barra = document.getElementById("progress");
+  barra.style.width = `${(feito/total)*100}%`;
+}
+
+function voltarMenu(){
+  document.getElementById("quizArea").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("result").innerHTML="";
+  document.querySelector(".progress-bar").classList.add("hidden");
+  document.getElementById("refazerErradas").classList.add("hidden");
+}
+
+function refazerErradas(){
+  const erradas = [];
+  questoesAtuais.forEach((q,i)=>{
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(marcada.value !== q.correta) erradas.push(q);
+  });
+  if(erradas.length>0){
+    questoesAtuais = erradas;
+    let html = `<h2>Refazendo Questões Erradas</h2><form id="quizForm">`;
+    questoesAtuais.forEach((q,i)=>{
+      html += `<div class="question" id="q${i}">
+        <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+      q.opcoes.forEach(op=>{
+        html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+      });
+      html += "</div>";
+    });
+    html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+    document.getElementById("quizArea").innerHTML = html;
+    document.getElementById("result").innerHTML="";
+    document.getElementById("refazerErradas").classList.add("hidden");
+    atualizarProgresso(0,questoesAtuais.length);
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      validarRespostas(questoesAtuais);
+    });
+  } else {
+    alert("🎉 Parabéns! Você acertou todas!");
+    voltarMenu();
+  }
+}
+</script>
+</body>
+</html>

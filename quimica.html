@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado PUC - Química</title>
+<link rel="icon" href="./pucfavicon.ico">
+<style>
+/* --------------------- Geral --------------------- */
+body {
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  background-color: rgba(0,0,0,0.25);
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+}
+h1 { text-align: center; margin-bottom: 20px; }
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+}
+.menu button {
+  background-color: #1abc9c;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background-color: #16a085; transform: scale(1.05); }
+.question {
+  background-color: rgba(0,0,0,0.2);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.question:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+label { display: block; margin: 6px 0; cursor: pointer; }
+label.correct { background-color: rgba(60,221,66,0.4); border-radius: 6px; padding: 5px; }
+label.wrong { background-color: rgba(222,29,15,0.4); border-radius: 6px; padding: 5px; }
+.explanation {
+  background-color: rgba(255,255,255,0.15);
+  border-left: 4px solid #ffeb3b;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 5px;
+}
+button.submit, #backBtn, #refazerErradas {
+  display: block;
+  background-color: #1abc9c;
+  border: none;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 20px auto;
+  transition: 0.3s;
+}
+button.submit:hover, #backBtn:hover, #refazerErradas:hover { background-color: #16a085; }
+#result { text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+.hidden { display: none; }
+.progress-bar {
+  width: 100%;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.progress-bar-inner {
+  height: 20px;
+  width: 0%;
+  background-color: #1abc9c;
+  border-radius: 8px;
+  transition: width 0.4s ease;
+}
+</style>
+</head>
+<body>
+<div class="container" id="mainContainer">
+  <h1>⚗️ Simulado PUC - Química</h1>
+  <p>Escolha um tema e responda às questões:</p>
+  <div class="menu" id="menu">
+    <button onclick="abrirTema('tabela')">Tabela Periódica</button>
+    <button onclick="abrirTema('ligacoes')">Ligações Químicas</button>
+    <button onclick="abrirTema('reacoes')">Reações Químicas</button>
+    <button onclick="abrirTema('estequiometria')">Estequiometria</button>
+    <button onclick="abrirTema('ph')">pH e pOH</button>
+    <button onclick="abrirTema('gases')">Gases</button>
+  </div>
+
+  <div class="progress-bar hidden"><div class="progress-bar-inner" id="progress"></div></div>
+  <div id="quizArea" class="hidden"></div>
+  <div id="result"></div>
+  <button id="refazerErradas" class="hidden" onclick="refazerErradas()">Refazer questões erradas</button>
+  <button id="backBtn" onclick="voltarMenu()">⬅ Voltar ao Menu</button>
+</div>
+
+<script>
+// ----------------- Banco de questões -----------------
+const banco = {
+  tabela: [
+    {pergunta:"Qual elemento químico tem símbolo O?", opcoes:["Ouro","Oxigênio","Ósmio"], correta:"Oxigênio", explicacao:"O é o símbolo do oxigênio. Ouro é Au e ósmio é Os."},
+    {pergunta:"O número atômico indica:", opcoes:["Número de nêutrons","Número de elétrons","Número de prótons"], correta:"Número de prótons", explicacao:"O número atômico corresponde ao número de prótons no núcleo."},
+    {pergunta:"Os elementos do grupo 18 são chamados de:", opcoes:["Halogênios","Metais alcalinos","Gases nobres"], correta:"Gases nobres", explicacao:"Grupo 18 da tabela periódica: gases nobres como Ne, Ar, He."}
+  ],
+  ligacoes: [
+    {pergunta:"A ligação entre átomos com grande diferença de eletronegatividade é:", opcoes:["Covalente","Iônica","Metálica"], correta:"Iônica", explicacao:"Na ligação iônica, há transferência de elétrons entre metal e ametal."},
+    {pergunta:"Na ligação covalente ocorre:", opcoes:["Compartilhamento de elétrons","Perda de elétrons","Ganho de elétrons"], correta:"Compartilhamento de elétrons", explicacao:"Os átomos compartilham elétrons para completar a camada de valência."}
+  ],
+  reacoes: [
+    {pergunta:"Na reação 2H₂ + O₂ → 2H₂O, o produto formado é:", opcoes:["Gás oxigênio","Água","Hidrogênio"], correta:"Água", explicacao:"Essa reação representa a formação da água."},
+    {pergunta:"Na reação de neutralização há:", opcoes:["Formação de sal e água","Liberação de gás","Oxidação"], correta:"Formação de sal e água", explicacao:"Ácido + Base → Sal + Água."}
+  ],
+  estequiometria: [
+    {pergunta:"Na equação balanceada, as massas dos reagentes e produtos:", opcoes:["São diferentes","São iguais","Podem ser qualquer valor"], correta:"São iguais", explicacao:"Lei de Lavoisier: a massa se conserva nas reações químicas."},
+    {pergunta:"Em 2H₂ + O₂ → 2H₂O, quantas moléculas de água se formam?", opcoes:["1","2","4"], correta:"2", explicacao:"A proporção estequiométrica mostra que 2 moléculas de H₂ formam 2 de H₂O."}
+  ],
+  ph: [
+    {pergunta:"Uma solução com pH = 2 é:", opcoes:["Básica","Neutra","Ácida"], correta:"Ácida", explicacao:"pH < 7 indica meio ácido."},
+    {pergunta:"Uma solução com pOH = 3 tem pH igual a:", opcoes:["11","10","7"], correta:"11", explicacao:"pH + pOH = 14 → pH = 14 - 3 = 11."}
+  ],
+  gases: [
+    {pergunta:"Na Lei de Boyle, qual grandeza permanece constante?", opcoes:["Temperatura","Volume","Pressão"], correta:"Temperatura", explicacao:"Na Lei de Boyle, T é constante e P × V = constante."},
+    {pergunta:"A equação geral dos gases é:", opcoes:["PV=nRT","E=mc²","V/T=constante"], correta:"PV=nRT", explicacao:"Equação dos gases ideais relaciona P, V, n, R e T."}
+  ]
+};
+
+// ----------------- Funções JS -----------------
+let questoesAtuais = [];
+function sortearQuestoes(tema){
+  const questoes = [...banco[tema]];
+  const selecionadas = [];
+  while(selecionadas.length<3 && questoes.length>0){
+    const idx = Math.floor(Math.random()*questoes.length);
+    selecionadas.push(questoes.splice(idx,1)[0]);
+  }
+  return selecionadas;
+}
+
+function abrirTema(tema){
+  const quizArea = document.getElementById("quizArea");
+  const menu = document.getElementById("menu");
+  const result = document.getElementById("result");
+  const backBtn = document.getElementById("backBtn");
+  const progressBar = document.querySelector(".progress-bar");
+
+  menu.classList.add("hidden");
+  result.innerHTML="";
+  backBtn.style.display="none";
+  document.getElementById("refazerErradas").classList.add("hidden");
+  quizArea.classList.remove("hidden");
+  progressBar.classList.remove("hidden");
+  atualizarProgresso(0,3);
+
+  questoesAtuais = sortearQuestoes(tema);
+  let html = `<h2>${tema.replace('_',' ').toUpperCase()}</h2><form id="quizForm">`;
+  questoesAtuais.forEach((q,i)=>{
+    html += `<div class="question" id="q${i}">
+      <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+    q.opcoes.forEach(op=>{
+      html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+    });
+    html += "</div>";
+  });
+  html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+  quizArea.innerHTML = html;
+
+  document.getElementById("quizForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    validarRespostas(questoesAtuais);
+  });
+}
+
+function validarRespostas(questoes){
+  for(let i=0;i<questoes.length;i++){
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(!marcada){
+      alert("⚠️ Você deve responder todas as questões antes de enviar!");
+      return;
+    }
+  }
+  corrigirProva(questoes);
+}
+
+function corrigirProva(questoes){
+  let acertos=0;
+  questoes.forEach((q,i)=>{
+    const labels = document.querySelectorAll(`#q${i} label`);
+    labels.forEach(label=>{
+      const input = label.querySelector("input");
+      input.disabled=true;
+      if(input.value===q.correta){ label.classList.add("correct"); acertos++;}
+      else if(input.checked){ label.classList.add("wrong");}
+    });
+    const divExp = document.createElement("div");
+    divExp.classList.add("explanation");
+    divExp.innerHTML = `<strong>Explicação:</strong> ${q.explicacao}`;
+    document.getElementById(`q${i}`).appendChild(divExp);
+  });
+  document.getElementById("result").innerHTML = `✅ Você acertou ${acertos} de ${questoes.length} questões!`;
+  document.getElementById("refazerErradas").classList.remove("hidden");
+  document.getElementById("backBtn").style.display="block";
+}
+
+function atualizarProgresso(feito,total){
+  const barra = document.getElementById("progress");
+  barra.style.width = `${(feito/total)*100}%`;
+}
+
+function voltarMenu(){
+  document.getElementById("quizArea").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+  document.getElementById("result").innerHTML="";
+  document.querySelector(".progress-bar").classList.add("hidden");
+  document.getElementById("refazerErradas").classList.add("hidden");
+}
+
+function refazerErradas(){
+  const erradas = [];
+  questoesAtuais.forEach((q,i)=>{
+    const marcada = document.querySelector(`input[name='q${i}']:checked`);
+    if(marcada.value !== q.correta) erradas.push(q);
+  });
+  if(erradas.length>0){
+    questoesAtuais = erradas;
+    let html = `<h2>Refazendo Questões Erradas</h2><form id="quizForm">`;
+    questoesAtuais.forEach((q,i)=>{
+      html += `<div class="question" id="q${i}">
+        <h3>${i+1}️⃣ ${q.pergunta}</h3>`;
+      q.opcoes.forEach(op=>{
+        html += `<label><input type="radio" name="q${i}" value="${op}"> ${op}</label>`;
+      });
+      html += "</div>";
+    });
+    html += `<button type="submit" class="submit">Enviar Respostas</button></form>`;
+    document.getElementById("quizArea").innerHTML = html;
+    document.getElementById("result").innerHTML="";
+    document.getElementById("refazerErradas").classList.add("hidden");
+    atualizarProgresso(0,questoesAtuais.length);
+    document.getElementById("quizForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      validarRespostas(questoesAtuais);
+    });
+  } else {
+    alert("🎉 Parabéns! Você acertou todas!");
+    voltarMenu();
+  }
+}
+</script>
+</body>
+</html>

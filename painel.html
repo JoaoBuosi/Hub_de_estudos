@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Hub de Estudos</title>
+  <link rel="icon" href="./pucfavicon.ico">
+
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #ffffff, #373d3f, #1b2a31);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      color: #fff;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(27,42,49,0.9);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 15px 25px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin: 15px 0;
+      transition: 0.3s;
+      width: 250px;
+      gap: 10px;
+    }
+
+    .btn:hover {
+      background-color: #4a6068;
+    }
+
+    .btn img {
+      width: 30px;
+      height: 30px;
+    }
+
+    /* Botão de criar material posicionado acima do outro botão */
+    .top-btn {
+      background-color: #1b2a31;
+      width: 250px;
+      padding: 12px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .top-btn:hover {
+      background-color: #4a6068;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="bemvindo">Bem-vindo!</h1>
+
+  <!-- Botão "+ Criar novo material" -->
+  <button class="btn top-btn" onclick="alert('Funcionalidade de criar material ainda não implementada!')">
+    + Criar novo material
+  </button>
+
+  <!-- Botão "Simulado PUC" redireciona para index.html -->
+  <button class="btn" onclick="window.location.href='index.html'">
+    <img src="Gemini_Generated_Image_huuc52huuc52huuc-removebg-preview (1).png" alt="Logo">
+    Simulado PUC
+  </button>
+
+  <script>
+    // Mostra nome do usuário logado
+    const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+    if (!user) {
+      window.location.href = 'entrar.html';
+    } else {
+      document.getElementById('bemvindo').textContent = `Bem-vindo, ${user.nome}! Ao seu HUB de estudos`;
+    }
+  </script>
+</body>
+</html>

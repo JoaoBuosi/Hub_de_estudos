@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Estudos</title>
+    <link rel="icon" href="./pucfavicon.ico">
+
+    <style>
+    /* --------------------- Geral --------------------- */
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #ffffff, #373d3f, #1b2a31);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      color: #fff;
+      min-height: 100vh;
+      margin: 0;
+      padding-top: 100px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --------------------- Cabeçalho --------------------- */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 40px;
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90%;
+      z-index: 1000;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      width: 120px;
+    }
+
+    .header h1 {
+      font-size: 1.8em;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+
+    /* --- Botões do topo direito --- */
+    .top-right {
+      display: flex;
+      gap: 10px;
+    }
+
+.entrar{
+ background-color: #1b2a31;
+ color: white;
+ border-radius: 50%;
+ width: 150px;
+ height: 40px;
+ } 
+.criar{
+background-color: #1b2a31; 
+color: white;
+ border-radius: 50%;
+  width: 150px; 
+ height: 40px; 
+ top: 10px; 
+ right: 10px; 
+} 
+.entrar:hover{ 
+background-color: #4a6068;
+} 
+.criar:hover{ 
+background-color: #4a6068; 
+}
+
+    /* --------------------- Conteúdo principal --------------------- */
+    .container {
+      max-width: 1000px;
+      background-color: rgba(0, 0, 0, 0.25);
+      margin: 150px auto;
+      padding: 40px;
+      border-radius: 25px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      text-align: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .container h2 {
+      margin-bottom: 30px;
+      font-size: 1.8em;
+    }
+
+    /* --- Cards do menu --- */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      justify-items: center;
+    }
+
+    .card {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 25px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 250px;
+      transition: 0.3s;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .card:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin-top: 10px;
+      color: #fff;
+    }
+
+    .card p {
+      color: #ccc;
+      font-size: 0.9em;
+    }
+
+
+
+    </style>
+</head>
+<body>
+
+  <!-- Cabeçalho -->
+  <header class="header">
+    <img class="logo" src="Gemini_Generated_Image_huuc52huuc52huuc-removebg-preview (1).png" alt="Logo">
+    <h1>Hub de Estudos</h1>
+
+    <div class="top-right">
+      <button class="entrar" onclick="window.location.href='entrar.html'">Entrar</button>
+      <button class="criar" onclick="window.location.href='conta.html'">Criar Conta</button>
+    </div>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main class="container">
+    <h2>Escolha uma área</h2>
+    <div class="menu-grid">
+      <div class="card" onclick="window.location.href='materias.html'">
+        📘
+        <h3>Matérias</h3>
+        <p>Acesse seus conteúdos e revisões.</p>
+      </div>
+      <div class="card" onclick="window.location.href='progresso.html'">
+        📊
+        <h3>Progresso</h3>
+        <p>Veja seu desempenho e estatísticas.</p>
+      </div>
+      <div class="card" onclick="window.location.href='agenda.html'">
+        🗓️
+        <h3>Agenda</h3>
+        <p>Gerencie tarefas e prazos de estudo.</p>
+      </div>
+      <div class="card" onclick="window.location.href='recursos.html'">
+        💡
+        <h3>Recursos</h3>
+        <p>Links, anotações e materiais extras.</p>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
