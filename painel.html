@@ -25,27 +25,7 @@
       100% { background-position: 0% 50%; }
     }
     h1 { text-align: center; margin-bottom: 30px; }
-    .btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: rgba(27,42,49,0.9);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      padding: 15px 25px;
-      font-size: 1.1em;
-      cursor: pointer;
-      margin: 15px 0;
-      transition: 0.3s;
-      width: 250px;
-      gap: 10px;
-      position: relative;
-    }
-    .btn:hover { background-color: #4a6068; }
-    .btn img { width: 30px; height: 30px; }
-
-    .games, .jobs {
+    .btn, .games, .jobs {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -61,8 +41,8 @@
       width: 250px;
       gap: 10px;
     }
-    .games:hover, .jobs:hover { background-color: #4a6068; }
-    .games img, .jobs img { width: 30px; height: 30px; }
+    .btn:hover, .games:hover, .jobs:hover { background-color: #4a6068; }
+    .btn img, .games img, .jobs img { width: 30px; height: 30px; }
 
     .top-btn {
       background-color: #1b2a31;
@@ -81,28 +61,6 @@
       align-items: center;
       width: 100%;
     }
-
-    .material-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-      margin: 8px 0;
-      width: 250px;
-    }
-
-    .delete-btn {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      font-weight: bold;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -110,58 +68,88 @@
 <h1 id="bemvindo">Bem-vindo!</h1>
 
 <!-- Botão "+ Criar novo material" -->
-<button class="btn top-btn" onclick="window.location.href='novo_material.html'">
+<button class="btn top-btn" id="btnNovo" onclick="window.location.href='novo_material.html'">
   + Criar novo material
 </button>
 
-<!-- Botões existentes -->
-<button class="btn" onclick="window.location.href='index.html'">
-  <img src="Gemini_Generated_Image_huuc52huuc52huuc-removebg-preview (1).png" alt="Logo">
-  Simulado PUC
-</button>
+<!-- Botões visíveis só para o João -->
+<div id="botoes-admin">
+  <button class="btn" onclick="window.location.href='index.html'">
+    <img src="Gemini_Generated_Image_huuc52huuc52huuc-removebg-preview (1).png" alt="Logo">
+    Simulado PUC
+  </button>
 
-<button class="games" onclick="window.location.href='games.html'">
-  <img src="jogos.png" alt="Logo dos jogos">
-  Jogos que já fiz
-</button>
+  <button class="games" onclick="window.location.href='games.html'">
+    <img src="jogos.png" alt="Logo dos jogos">
+    Jogos que já fiz
+  </button>
 
-<button class="jobs" onclick="window.location.href='trabalhos.html'">
-  <img src="trabalhos.png" alt="logo trabalhos">
-  Trabalhos e Projetos que ja fiz
-</button>
+  <button class="jobs" onclick="window.location.href='trabalhos.html'">
+    <img src="trabalhos.png" alt="logo trabalhos">
+    Trabalhos e Projetos que já fiz
+  </button>
+</div>
 
 <!-- Container dos materiais criados -->
 <div id="materiais-container"></div>
 
 <script>
-// Pegando dados do formulário de login
-function login() {
-  const email = document.getElementById('email').value;
-  const senha = document.getElementById('senha').value;
+document.addEventListener("DOMContentLoaded", () => {
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-  // Checagem da conta específica
-  if(email === 'joaovbuosi@gmail.com' && senha === 'joao240500'){
-    const usuario = { email: email, nome: 'João Vitor Fernandes Buosi' };
-    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-    alert('Login bem-sucedido!');
-    window.location.href = 'painel.html';
+  if (!usuarioLogado) {
+    window.location.href = "entrar.html";
     return;
   }
 
-  // Aqui você pode colocar checagem com outros usuários cadastrados
-  const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-  const usuario = usuarios.find(u => u.email === email && u.senha === senha);
-  if(usuario){
-    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-    alert('Login bem-sucedido!');
-    window.location.href = 'painel.html';
-  } else {
-    alert('Email ou senha incorretos!');
-  }
-}
+  // Atualiza mensagem de boas-vindas
+  document.getElementById("bemvindo").textContent = `Bem-vindo(a), ${usuarioLogado.nome}!`;
 
-// Se você tiver um botão no HTML:
-// <button onclick="login()">Entrar</button>
+  const container = document.getElementById("materiais-container");
+  const botoesAdmin = document.getElementById("botoes-admin");
+
+  // ✅ Se for o João (admin)
+  if (usuarioLogado.tipo === "admin") {
+    botoesAdmin.style.display = "flex";
+    botoesAdmin.style.flexDirection = "column";
+
+    const botoesSalvos = JSON.parse(localStorage.getItem("botoesSalvos")) || [];
+    renderizarBotoes(botoesSalvos);
+  } 
+  // 👤 Se for outro usuário comum
+  else {
+    botoesAdmin.style.display = "none";
+    container.innerHTML = `<button class="btn top-btn" onclick="criarNovoMaterial()">+ Novo Material</button>`;
+  }
+
+  function renderizarBotoes(lista) {
+    lista.forEach((botao) => {
+      const btn = document.createElement("button");
+      btn.classList.add("btn");
+      btn.textContent = botao.nome;
+      container.appendChild(btn);
+    });
+  }
+});
+
+// Criar novo material
+function criarNovoMaterial() {
+  const nome = prompt("Nome do novo material:");
+  if (!nome) return;
+
+  const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+  if (!usuarioLogado) return;
+
+  // Só o João salva permanentemente
+  if (usuarioLogado.tipo === "admin") {
+    const botoesSalvos = JSON.parse(localStorage.getItem("botoesSalvos")) || [];
+    botoesSalvos.push({ nome });
+    localStorage.setItem("botoesSalvos", JSON.stringify(botoesSalvos));
+  }
+
+  location.reload();
+}
 </script>
 </body>
 </html>
+
