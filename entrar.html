@@ -104,29 +104,45 @@
     </div>
   </div>
 
-  <script>
-    const formLogin = document.getElementById('formLogin');
+<script>
+  const formLogin = document.getElementById('formLogin');
 
-    formLogin.addEventListener('submit', (e) => {
-      e.preventDefault();
+  formLogin.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      const email = document.getElementById('email').value.trim();
-      const senha = document.getElementById('senha').value;
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
 
-      const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
+    const usuarios = JSON.parse(localStorage.getItem('usuarios')) || [];
 
-      const user = usuarios.find(u => u.email === email && u.senha === btoa(senha));
+    // ✅ Conta especial do João
+    if (email === "joaovbuosi@gmail.com" && senha === "Joao240500") {
+      const userEspecial = {
+        nome: "João Vitor Fernandes Buosi",
+        email: email,
+        tipo: "admin"
+      };
 
-      if (user) {
-        alert(`Bem-vindo(a), ${user.nome}!`);
-        localStorage.setItem('usuarioLogado', JSON.stringify(user));
-        window.location.href = 'painel.html';
-      } else {
-        alert('E-mail ou senha incorretos!');
-      }
-    });
-  </script>
+      localStorage.setItem('usuarioLogado', JSON.stringify(userEspecial));
+      alert("Bem-vindo(a), João!");
+      window.location.href = "painel.html";
+      return;
+    }
 
+    // 🔍 Verifica se o usuário comum existe
+    const user = usuarios.find(u => u.email === email && u.senha === btoa(senha));
+
+    if (user) {
+      user.tipo = "comum";
+      localStorage.setItem('usuarioLogado', JSON.stringify(user));
+      alert(`Bem-vindo(a), ${user.nome}!`);
+      window.location.href = 'painel.html';
+    } else {
+      alert('E-mail ou senha incorretos!');
+    }
+  });
+</script>
 </body>
 </html>
+
 
