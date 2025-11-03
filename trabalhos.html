@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfólio | João Vitor Buosi</title>
+  <link rel="icon" href="./pucfavicon.ico">
+  <!-- Fonte Google -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET BÁSICO ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; scroll-behavior: smooth; }
+    img { display: block; max-width: 100%; }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 50px;
+      background: rgba(20,20,20,0.75);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #4f46e5;
+      z-index: 1000;
+    }
+    .nav-left { display: flex; align-items: center; gap: 15px; }
+    .logo { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.4rem; background: linear-gradient(90deg, #9333ea, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .social-icons { display: flex; gap: 12px; }
+    .social-icons img { width: 26px; filter: brightness(0) invert(1); transition: 0.3s; }
+    .social-icons img:hover { transform: scale(1.2); filter: brightness(0) saturate(100%) invert(59%) sepia(80%) saturate(621%) hue-rotate(240deg); }
+
+    nav ul { list-style: none; display: flex; gap: 25px; }
+    nav ul li a { color: #ccc; text-decoration: none; font-weight: 500; position: relative; transition: 0.3s; }
+    nav ul li a::after { content: ""; position: absolute; width: 0; height: 2px; background: #4f46e5; left: 0; bottom: -3px; transition: 0.3s; }
+    nav ul li a:hover::after, nav ul li a.active::after { width: 100%; }
+    nav ul li a:hover, nav ul li a.active { color: #fff; }
+
+    /* ===== HEADER ===== */
+    header {
+      padding: 120px 20px 60px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+    }
+    header h1 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 3rem; margin-bottom: 10px; }
+    header p { font-size: 1.2rem; color: #eee; }
+
+    /* ===== SEÇÕES ===== */
+    section { padding: 60px 20px; max-width: 1000px; margin: 0 auto; }
+    h2 { color: #a78bfa; font-family: 'Montserrat', sans-serif; font-weight: 700; border-bottom: 2px solid #4f46e5; padding-bottom: 5px; margin-bottom: 25px; }
+
+    /* ===== SKILLS ===== */
+    .skills { display: flex; flex-wrap: wrap; gap: 15px; }
+    .skill {
+      background: #1f1f1f;
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: 1px solid #4f46e5;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .skill:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(147,51,234,0.6); }
+
+    /* ===== BOTÃO ANIMADO ===== */
+    .button-animado {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 30px;
+      color: #fff;
+      font-weight: 500;
+      border: 2px solid transparent;
+      background: linear-gradient(#111,#111) padding-box, linear-gradient(45deg,#9333ea,#4f46e5,#06b6d4,#9333ea) border-box;
+      background-size: 200% 200%;
+      animation: bordaAnimada 4s linear infinite;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .button-animado:hover { transform: scale(1.05); box-shadow: 0 0 20px #9333ea; }
+    @keyframes bordaAnimada { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+    /* ===== CARROSSEL ===== */
+    .carousel-container { position: relative; overflow: hidden; border-radius: 10px; border: 2px solid #4f46e5; margin-bottom: 40px; }
+    .carousel { display: flex; transition: transform 0.5s ease; cursor: grab; }
+    .carousel img { width: 100%; border-radius: 10px; pointer-events: none; }
+
+    .carousel-buttons { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); }
+    .carousel-buttons button { background: rgba(0,0,0,0.5); border: none; color: white; font-size: 26px; padding: 10px; cursor: pointer; transition: 0.3s; }
+    .carousel-buttons button:hover { background: rgba(79,70,229,0.7); }
+
+    /* ===== FADE-IN ===== */
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===== BOTÃO TOPO ===== */
+    #topBtn { position: fixed; bottom: 30px; right: 30px; background: #4f46e5; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 18px; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
+    #topBtn.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-left">
+      <div class="logo">João Buosi</div>
+      <div class="social-icons">
+        <a href="https://github.com/JoaoBuosi" target="_blank"><img src="github.png" alt="GitHub"></a>
+        <a href="https://www.linkedin.com/in/jo%C3%A3ovitorbuosi" target="_blank"><img src="linkedin.png" alt="LinkedIn"></a>
+        <a href="https://www.instagram.com/dev.jbuosi/" target="_blank"><img src="instagram.png" alt="Instagram"></a>
+      </div>
+    </div>
+    <ul>
+      <li><a href="#sobre">Quem sou</a></li>
+      <li><a href="#trajetoria">Trajetória</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#programacao">Programação</a></li>
+      <li><a href="#cinema">Cinema</a></li>
+    </ul>
+  </nav>
+
+  <!-- HEADER -->
+  <header>
+    <h1>Meu Portfólio</h1>
+    <p>João Vitor Fernandes Buosi</p>
+  </header>
+
+  <!-- SEÇÕES EXEMPLO -->
+  <section id="sobre" class="fade-in">
+    <h2>Quem sou eu</h2>
+    <p>Sou João Vitor Fernandes Buosi, apaixonado por tecnologia, cinema e inovação. Estudo Ciência de Dados e tenho experiência em direção, edição e color grading.</p>
+  </section>
+
+  <section id="trajetoria" class="fade-in">
+    <h2>Minha trajetória</h2>
+    <p>Iniciei no cinema, dirigindo e editando curtas e videoclipes. Depois migrei para tecnologia, explorando programação e ciência de dados. Hoje desenvolvo projetos que unem estética, lógica e inovação.</p>
+  </section>
+
+  <section id="skills" class="fade-in">
+    <h2>Minhas Skills</h2>
+    <div class="skills">
+      <div class="skill">Python</div>
+      <div class="skill">HTML / CSS / JS</div>
+      <div class="skill">Flet</div>
+      <div class="skill">Pygame</div>
+      <div class="skill">Premiere Pro</div>
+      <div class="skill">DaVinci Resolve</div>
+      <div class="skill">Direção de Arte</div>
+      <div class="skill">VFX / Motion</div>
+      <div class="skill">IA Generativa</div>
+    </div>
+  </section>
+
+  <!-- PROJETOS (Carrossel) -->
+  <section id="programacao" class="fade-in">
+    <h2>Projetos de Programação</h2>
+    <div class="carousel-container">
+      <div class="carousel" id="carousel-programacao">
+        <img src="img/prog1.jpg" alt="Projeto 1">
+        <img src="img/prog2.jpg" alt="Projeto 2">
+        <img src="img/prog3.jpg" alt="Projeto 3">
+      </div>
+      <div class="carousel-buttons">
+        <button onclick="mudarSlide('carousel-programacao', -1)">&#10094;</button>
+        <button onclick="mudarSlide('carousel-programacao', 1)">&#10095;</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="cinema" class="fade-in">
+    <h2>Trabalhos de Cinema</h2>
+    <div class="carousel-container">
+      <div class="carousel" id="carousel-cinema">
+        <img src="img/cinema1.jpg" alt="Cinema 1">
+        <img src="img/cinema2.jpg" alt="Cinema 2">
+        <img src="img/cinema3.jpg" alt="Cinema 3">
+      </div>
+      <div class="carousel-buttons">
+        <button onclick="mudarSlide('carousel-cinema', -1)">&#10094;</button>
+        <button onclick="mudarSlide('carousel-cinema', 1)">&#10095;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTÃO VOLTAR AO TOPO -->
+  <button id="topBtn" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // ===== FADE-IN AO SCROLL =====
+    const faders = document.querySelectorAll(".fade-in");
+    const appearOptions = { threshold: 0.3, rootMargin: "0px 0px -50px 0px" };
+    const appearOnScroll = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("visible"); });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // ===== CARROSSEL =====
+    function mudarSlide(id, dir) {
+      const carousel = document.getElementById(id);
+      const imgs = carousel.querySelectorAll("img");
+      let index = Array.from(imgs).findIndex(img => img.style.display !== "none");
+      imgs.forEach(img => img.style.display = "none");
+      index = (index + dir + imgs.length) % imgs.length;
+      imgs[index].style.display = "block";
+    }
+    document.querySelectorAll(".carousel").forEach(c => { c.querySelectorAll("img").forEach((img,i)=>img.style.display=i===0?"block":"none"); });
+
+    // ===== SCROLL PARA TOPO =====
+    const topBtn = document.getElementById("topBtn");
+    window.addEventListener("scroll", () => { if(window.scrollY > 300) topBtn.classList.add("show"); else topBtn.classList.remove("show"); });
+    function scrollToTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+
+    // ===== NAV LINK ATIVO =====
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll("nav ul li a");
+    window.addEventListener("scroll", () => {
+      let current = "";
+      sections.forEach(sec => { const top = sec.offsetTop - 120; if(scrollY >= top) current = sec.getAttribute("id"); });
+      navLinks.forEach(a => a.classList.remove("active"));
+      if(current) document.querySelector(`nav ul li a[href="#${current}"]`)?.classList.add("active");
+    });
+  </script>
+</body>
+</html>
