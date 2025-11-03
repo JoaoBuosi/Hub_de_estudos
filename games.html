@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jogos | João Vitor Buosi</title>
+  <link rel="icon" href="./pucfavicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; scroll-behavior: smooth; }
+
+    /* ===== NAVBAR ===== */
+    nav {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 50px;
+      background: rgba(20,20,20,0.75);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #4f46e5;
+      z-index: 1000;
+    }
+    .nav-left { display: flex; align-items: center; gap: 15px; }
+    .logo { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.4rem; background: linear-gradient(90deg, #9333ea, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .social-icons { display: flex; gap: 12px; }
+    .social-icons img { width: 26px; filter: brightness(0) invert(1); transition: 0.3s; }
+    .social-icons img:hover { transform: scale(1.2); }
+
+    nav ul { list-style: none; display: flex; gap: 25px; }
+    nav ul li a { color: #ccc; text-decoration: none; font-weight: 500; position: relative; transition: 0.3s; }
+    nav ul li a::after { content: ""; position: absolute; width: 0; height: 2px; background: #4f46e5; left: 0; bottom: -3px; transition: 0.3s; }
+    nav ul li a:hover::after, nav ul li a.active::after { width: 100%; }
+    nav ul li a:hover, nav ul li a.active { color: #fff; }
+
+    header { padding: 120px 20px 60px 20px; text-align: center; }
+    header h1 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 3rem; margin-bottom: 10px; background: linear-gradient(135deg,#9333ea,#4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    header p { font-size: 1.2rem; color: #ccc; }
+
+    section { padding: 60px 20px; max-width: 1000px; margin: 0 auto; }
+    h2 { color: #a78bfa; font-family: 'Montserrat', sans-serif; font-weight: 700; border-bottom: 2px solid #4f46e5; padding-bottom: 5px; margin-bottom: 25px; }
+
+    /* ===== CARDS DE JOGOS ===== */
+    .games-container { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 20px; }
+    .game-card {
+      background: #1f1f1f;
+      border: 1px solid #4f46e5;
+      border-radius: 15px;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+    .game-card:hover { transform: scale(1.05); box-shadow: 0 0 20px #9333ea; }
+    .game-card img { width: 100%; display: block; }
+    .game-card .content { padding: 15px; }
+    .game-card h3 { font-family: 'Montserrat', sans-serif; color: #fff; margin-bottom: 5px; }
+    .game-card p { font-size: 0.9rem; color: #ccc; }
+
+    /* ===== CARROSSEL INTERNO ===== */
+    .carousel-container { position: relative; overflow: hidden; border-radius: 10px; margin-top: 10px; }
+    .carousel { display: flex; transition: transform 0.5s ease; cursor: grab; }
+    .carousel img { width: 100%; pointer-events: none; border-radius: 10px; }
+
+    .carousel-buttons { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); }
+    .carousel-buttons button { background: rgba(0,0,0,0.5); border: none; color: white; font-size: 26px; padding: 10px; cursor: pointer; transition: 0.3s; }
+    .carousel-buttons button:hover { background: rgba(79,70,229,0.7); }
+
+    /* ===== FADE-IN ===== */
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===== BOTÃO TOPO ===== */
+    #topBtn { position: fixed; bottom: 30px; right: 30px; background: #4f46e5; border: none; border-radius: 50%; width: 45px; height: 45px; font-size: 18px; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
+    #topBtn.show { opacity: 1; }
+
+    /* ===== BOTÃO VOLTAR AO PAINEL ===== */
+    .button-animado {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 30px;
+      color: #fff;
+      font-weight: 500;
+      border: 2px solid transparent;
+      background: linear-gradient(#111,#111) padding-box, linear-gradient(45deg,#9333ea,#4f46e5,#06b6d4,#9333ea) border-box;
+      background-size: 200% 200%;
+      animation: bordaAnimada 4s linear infinite;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      margin-top: 30px;
+    }
+    .button-animado:hover { transform: scale(1.05); box-shadow: 0 0 20px #9333ea; }
+    @keyframes bordaAnimada { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="nav-left">
+      <div class="logo">João Buosi</div>
+      <div class="social-icons">
+        <a href="https://github.com/JoaoBuosi" target="_blank"><img src="github.png" alt="GitHub"></a>
+        <a href="https://www.linkedin.com/in/jo%C3%A3ovitorbuosi" target="_blank"><img src="linkedin.png" alt="LinkedIn"></a>
+        <a href="https://www.instagram.com/dev.jbuosi/" target="_blank"><img src="instagram.png" alt="Instagram"></a>
+      </div>
+    </div>
+    <ul>
+      <li><a href="#meus-jogos">Meus Jogos</a></li>
+    </ul>
+  </nav>
+
+  <header>
+    <h1>Meus Jogos</h1>
+    <p>Jogos que já desenvolvi e explorei</p>
+  </header>
+
+  <!-- SEÇÃO JOGOS -->
+  <section id="meus-jogos" class="fade-in">
+    <h2>Jogos Desenvolvidos</h2>
+    <div class="games-container">
+      <div class="game-card">
+        <img src="tela.png" alt="Jogo 1">
+        <div class="content">
+          <h3>Inheritance of The Abyss</h3>
+          <p>"Inheritance of the Abyss" é um RPG online imersivo, que combina exploração, narrativa e desafios estratégicos em um universo sombrio e misterioso. O jogador assume o papel de um herói que precisa descobrir os segredos de um abismo ancestral, enfrentando inimigos, superando obstáculos e desbloqueando habilidades especiais ao longo da jornada.</p>
+        </div>
+        <div class="carousel-container">
+          <div class="carousel" id="carousel-game1">
+            <img src="menu.png" alt="Screenshot 1">
+            <img src="jogo.png" alt="Screenshot 2">
+          </div>
+          <div class="carousel-buttons">
+            <button onclick="mudarSlide('carousel-game1', -1)">&#10094;</button>
+            <button onclick="mudarSlide('carousel-game1', 1)">&#10095;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card">
+        <img src="detona_ralph.png" alt="Jogo 2">
+        <div class="content">
+          <h3>Detona-Ralph</h3>
+          <p>Neste jogo inspirado no filme Detona Ralph, o jogador controla o personagem Ralph com o objetivo de destruir blocos e obstáculos em diferentes níveis, acumulando pontos e evitando armadilhas. O visual remete ao estilo arcade clássico, proporcionando uma experiência divertida e nostálgica.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTÃO VOLTAR AO PAINEL -->
+  <div style="text-align:center;">
+    <button class="button-animado" onclick="window.location.href='painel.html'">← Voltar ao Menu</button>
+  </div>
+
+  <!-- BOTÃO VOLTAR AO TOPO -->
+  <button id="topBtn" onclick="scrollToTop()">↑</button>
+
+  <script>
+    // ===== FADE-IN =====
+    const faders = document.querySelectorAll(".fade-in");
+    const appearOptions = { threshold: 0.3, rootMargin: "0px 0px -50px 0px" };
+    const appearOnScroll = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("visible"); });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // ===== CARROSSEL =====
+    function mudarSlide(id, dir) {
+      const carousel = document.getElementById(id);
+      const imgs = carousel.querySelectorAll("img");
+      let index = Array.from(imgs).findIndex(img => img.style.display !== "none");
+      imgs.forEach(img => img.style.display = "none");
+      index = (index + dir + imgs.length) % imgs.length;
+      imgs[index].style.display = "block";
+    }
+    document.querySelectorAll(".carousel").forEach(c => c.querySelectorAll("img").forEach((img,i)=>img.style.display=i===0?"block":"none"));
+
+    // ===== SCROLL TO TOP =====
+    const topBtn = document.getElementById("topBtn");
+    window.addEventListener("scroll", () => { if(window.scrollY>300) topBtn.classList.add("show"); else topBtn.classList.remove("show"); });
+    function scrollToTop(){ window.scrollTo({top:0, behavior:'smooth'}); }
+  </script>
+</body>
+</html>
